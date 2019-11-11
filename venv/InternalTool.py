@@ -1,5 +1,6 @@
 from tkinter import filedialog
 from tkinter import *
+from PIL import ImageTk, Image
 import os
 
 def main_home_screen():
@@ -25,8 +26,6 @@ def main_home_screen():
 
     main_screen.mainloop()
 
-# Hanapin mo me
-
 def folder_screen():
     global folder_selected
     global fselected
@@ -37,7 +36,7 @@ def folder_screen():
     folder.withdraw()
     folder_selected = filedialog.askdirectory()
     fselected = folder_selected
-
+    print(fselected)
     main_screen.destroy()
     browse_files()
 
@@ -76,15 +75,32 @@ def browse_files():
 
     def showcontent(event):
         x = lbox.curselection()[0]
-        file = lbox.get(x)
-        with open(file) as file:
+        file1 = lbox.get(x)
+        file = fselected + "/" + file1
+        print(file)
+        with open(file, 'rb') as file:
             file = file.read()
-        text.delete('1.0', tk.END)
-        text.insert(tk.END, file)
+        #text.delete('1.0', tk.END)
+        #text.insert(tk.END, file)
 
     def opensystem(event):
         x = lbox.curselection()[0]
-        os.system(lbox.get(x))
+        file1 = lbox.get(x)
+        file = fselected + "/" + file1
+        print(file)
+        #app_root = Tk()
+
+        # Setting it up
+        img = ImageTk.PhotoImage(Image.open(file))
+
+        # Displaying it
+        imglabel = Label(browse_screen, image=img).place(x=480, y=80, width=220, height=500)
+        '''
+        print(file2)
+        file = fselected + "/" + file2
+        print(file)
+        os.system(file)
+        '''
 
     lbox.bind("<<ListboxSelect>>", showcontent)
     lbox.bind("<Double-Button-1>", opensystem)
