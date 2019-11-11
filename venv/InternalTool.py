@@ -25,6 +25,8 @@ def main_home_screen():
 
     main_screen.mainloop()
 
+# Hanapin mo me
+
 def folder_screen():
     global folder_selected
     global fselected
