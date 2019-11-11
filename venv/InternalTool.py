@@ -36,7 +36,7 @@ def folder_screen():
     folder.withdraw()
     folder_selected = filedialog.askdirectory()
     fselected = folder_selected
-    print(fselected)
+
     main_screen.destroy()
     browse_files()
 
@@ -52,7 +52,7 @@ def browse_files():
     Label(browse_screen, text='Document Type: ' + str(dtype)).place(x=280, y=20)
     Label(browse_screen, text='Files').place(x=120, y=55)
     Label(browse_screen, text='Employee ID').place(x=350, y=55)
-    Label(browse_screen, text='Preview').place(x=730, y=55)
+    Label(browse_screen, text='Preview').place(x=710, y=55)
 
     flist = os.listdir(folder_selected)
     lbox = Listbox(browse_screen)
@@ -77,7 +77,6 @@ def browse_files():
         x = lbox.curselection()[0]
         file1 = lbox.get(x)
         file = fselected + "/" + file1
-        print(file)
         with open(file, 'rb') as file:
             file = file.read()
         #text.delete('1.0', tk.END)
@@ -87,20 +86,16 @@ def browse_files():
         x = lbox.curselection()[0]
         file1 = lbox.get(x)
         file = fselected + "/" + file1
-        print(file)
-        #app_root = Tk()
 
         # Setting it up
-        img = ImageTk.PhotoImage(Image.open(file))
+        img = Image.open(file)
+        maxsize = (380, 500)
+        im = img.resize(maxsize)
+        img = ImageTk.PhotoImage(im)
 
         # Displaying it
-        imglabel = Label(browse_screen, image=img).place(x=480, y=80, width=220, height=500)
-        '''
-        print(file2)
-        file = fselected + "/" + file2
-        print(file)
-        os.system(file)
-        '''
+        imglabel = Label(browse_screen, image=img).place(x=550, y=80, width=380, height=500)
+        imglabel.pack(side="bottom", fill="both", expand="yes")
 
     lbox.bind("<<ListboxSelect>>", showcontent)
     lbox.bind("<Double-Button-1>", opensystem)
