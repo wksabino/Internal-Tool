@@ -1,6 +1,7 @@
 from tkinter import filedialog
 from tkinter import *
 from PIL import ImageTk, Image
+#import img2pdf
 import os
 
 def main_home_screen():
@@ -41,8 +42,13 @@ def folder_screen():
     browse_files()
 
 def browse_files():
+    global dtype
+    global employee_id
+
     ccode = company_code.get()
     dtype = doc_type.get()
+
+    employee_id = StringVar()
 
     browse_screen = Tk()
     browse_screen.geometry('1000x650')
@@ -53,6 +59,10 @@ def browse_files():
     Label(browse_screen, text='Files').place(x=120, y=55)
     Label(browse_screen, text='Employee ID').place(x=350, y=55)
     Label(browse_screen, text='Preview').place(x=710, y=55)
+
+    id_label = Label(browse_screen, text='Add Employee ID: ').place(x=550, y=20)
+    Entry(browse_screen, textvariable=employee_id).place(x=700, y=20, height=25, width=50)
+    Button(browse_screen, text='Save', command='id_files').place(x=850, y=20, height=25, width=50)
 
     flist = os.listdir(folder_selected)
     lbox = Listbox(browse_screen)
@@ -79,28 +89,51 @@ def browse_files():
         file = fselected + "/" + file1
         with open(file, 'rb') as file:
             file = file.read()
-        #text.delete('1.0', tk.END)
-        #text.insert(tk.END, file)
 
     def opensystem(event):
+        global file_id
+        file_id = StringVar()
+
         x = lbox.curselection()[0]
         file1 = lbox.get(x)
+        file_id = file1
         file = fselected + "/" + file1
 
-        # Setting it up
         img = Image.open(file)
         maxsize = (380, 500)
         im = img.resize(maxsize)
         img = ImageTk.PhotoImage(im)
-
-        # Displaying it
         imglabel = Label(browse_screen, image=img).place(x=550, y=80, width=380, height=500)
         imglabel.pack(side="bottom", fill="both", expand="yes")
 
     lbox.bind("<<ListboxSelect>>", showcontent)
     lbox.bind("<Double-Button-1>", opensystem)
 
-    Button(browse_screen, text='Process', command='process_screen').place(x=600, y=600, height=30, width=300)
+    Button(browse_screen, text='Process', command=process_screen).place(x=600, y=600, height=30, width=300)
+    #Button(browse_screen, text='Add Employee ID', command=id_files).place(x=100, y=600, height=30, width=300)
+
     browse_screen.mainloop()
 
+def id_files():
+    id_screen = Tk()
+    id_screen.geometry('300x120')
+    id_screen.title('Employee ID')
+
+    Label(id_screen, text='File: ').place(x=20, y=15)
+    Label(id_screen, text=file_id).place(x=140, y=15)
+
+def destroy_empty():
+    id_screen.destroy()
+
+def process_screen():
+    os.mkdir(fselected + "/" + dtype)
+'''
+    pdffolder = fselected + "/" + dtype
+    image = Image.open(fselected)
+    pdf_bytes = img2pdf.convert(image.filename)
+    file = open(pdffolder, "wb")
+    file.write(pdf_bytes)
+    image.close()
+    file.close()
+'''
 main_home_screen()
