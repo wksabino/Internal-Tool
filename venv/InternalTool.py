@@ -48,21 +48,17 @@ def browse_files():
     ccode = company_code.get()
     dtype = doc_type.get()
 
-    employee_id = StringVar()
-
     browse_screen = Tk()
     browse_screen.geometry('1000x650')
     browse_screen.title('Internal Tool')
+
+    employee_id = StringVar()
 
     Label(browse_screen, text='Company Code: ' + str(ccode)).place(x=20, y=20)
     Label(browse_screen, text='Document Type: ' + str(dtype)).place(x=280, y=20)
     Label(browse_screen, text='Files').place(x=120, y=55)
     Label(browse_screen, text='Employee ID').place(x=350, y=55)
     Label(browse_screen, text='Preview').place(x=710, y=55)
-
-    id_label = Label(browse_screen, text='Add Employee ID: ').place(x=550, y=20)
-    Entry(browse_screen, textvariable=employee_id).place(x=700, y=20, height=25, width=50)
-    Button(browse_screen, text='Save', command='id_files').place(x=850, y=20, height=25, width=50)
 
     flist = os.listdir(folder_selected)
     lbox = Listbox(browse_screen)
@@ -80,8 +76,12 @@ def browse_files():
     lbox.config(yscrollcommand=scrollbar.set)
     lbox2.config(yscrollcommand=scrollbar2.set)
 
+    id_label = Label(browse_screen, text='Add Employee ID: ').place(x=550, y=20)
+    Entry(browse_screen, textvariable=employee_id).place(x=650, y=20, height=25, width=180)
+
     for item in flist:
         lbox.insert(END, item)
+        lbox2.insert(END, '<Add Employee ID>')
 
     def showcontent(event):
         x = lbox.curselection()[0]
@@ -92,12 +92,15 @@ def browse_files():
 
     def opensystem(event):
         global file_id
+        global x
         file_id = StringVar()
 
         x = lbox.curselection()[0]
         file1 = lbox.get(x)
         file_id = file1
         file = fselected + "/" + file1
+
+        Button(browse_screen, text='Save', command=id_files).place(x=840, y=20, height=25, width=50)
 
         img = Image.open(file)
         maxsize = (380, 500)
@@ -106,34 +109,29 @@ def browse_files():
         imglabel = Label(browse_screen, image=img).place(x=550, y=80, width=380, height=500)
         imglabel.pack(side="bottom", fill="both", expand="yes")
 
+    def id_files():
+        empid = employee_id.get()
+        lbox2.delete(x)
+        lbox2.insert(x, empid)
+
     lbox.bind("<<ListboxSelect>>", showcontent)
     lbox.bind("<Double-Button-1>", opensystem)
 
     Button(browse_screen, text='Process', command=process_screen).place(x=600, y=600, height=30, width=300)
-    #Button(browse_screen, text='Add Employee ID', command=id_files).place(x=100, y=600, height=30, width=300)
 
     browse_screen.mainloop()
 
-def id_files():
-    id_screen = Tk()
-    id_screen.geometry('300x120')
-    id_screen.title('Employee ID')
-
-    Label(id_screen, text='File: ').place(x=20, y=15)
-    Label(id_screen, text=file_id).place(x=140, y=15)
-
-def destroy_empty():
-    id_screen.destroy()
-
 def process_screen():
     os.mkdir(fselected + "/" + dtype)
-'''
-    pdffolder = fselected + "/" + dtype
-    image = Image.open(fselected)
-    pdf_bytes = img2pdf.convert(image.filename)
-    file = open(pdffolder, "wb")
-    file.write(pdf_bytes)
-    image.close()
-    file.close()
+'''    
+    flist1 = os.listdir(fselected)
+    for item in flist1:
+        pdffolder = fselected + "/" + dtype
+        image = Image.open(fselected)
+        pdf_bytes = img2pdf.convert(image.filename)
+        file = open(pdffolder, "wb")
+        file.write(pdf_bytes)
+        image.close()
+        file.close()
 '''
 main_home_screen()
