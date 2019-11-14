@@ -1,8 +1,7 @@
 from tkinter import filedialog
 from tkinter import *
 from PIL import ImageTk, Image
-#import img2pdf
-import os
+import shutil, os
 
 def main_home_screen():
     global main_screen
@@ -42,8 +41,11 @@ def folder_screen():
     browse_files()
 
 def browse_files():
+    global ccode
     global dtype
     global employee_id
+    global lbox2
+    global browse_screen
 
     ccode = company_code.get()
     dtype = doc_type.get()
@@ -81,7 +83,7 @@ def browse_files():
 
     for item in flist:
         lbox.insert(END, item)
-        lbox2.insert(END, '<Add Employee ID>')
+        lbox2.insert(END, 'Add Employee ID')
 
     def showcontent(event):
         x = lbox.curselection()[0]
@@ -122,16 +124,61 @@ def browse_files():
     browse_screen.mainloop()
 
 def process_screen():
-    os.mkdir(fselected + "/" + dtype)
-'''    
+    global new_path
+
+    new_path = StringVar()
+    n = 0
+
+    #create a new folder with document type as folder name
+    new_path = os.mkdir(fselected + "/" + dtype)
+    new_path1 = str(fselected + "/" + dtype)
+    #list all files in selected folder
     flist1 = os.listdir(fselected)
-    for item in flist1:
-        pdffolder = fselected + "/" + dtype
-        image = Image.open(fselected)
-        pdf_bytes = img2pdf.convert(image.filename)
-        file = open(pdffolder, "wb")
-        file.write(pdf_bytes)
-        image.close()
-        file.close()
-'''
+    #list all entries for employee id
+    employeeid = list(lbox2.get(0, END))
+    #get total count of files in selected folder
+    count = len(flist1)
+
+    for file in flist1:
+        fsrce = fselected + "/" + file
+        #process only files
+        if os.path.isfile(fsrce):
+            emp_id = employeeid[n]
+            fname, file_ext = os.path.splitext(file)
+            #rename files to copy
+            dest_name = ccode + "_" + emp_id + "_" + dtype + file_ext
+            fdest = new_path1  + "/" + dest_name
+            shutil.copy(fsrce, fdest)
+
+            #name of file to pdf
+            dest_name_pdf = ccode + "_" + emp_id + "_" + dtype + ".pdf"
+            fdest_pdf = new_path1  + "/" + dest_name_pdf
+            #convert file to pdf
+            im=Image.open(fdest)
+            if im.mode == "RGBA":
+                im = im.convert("RGB")
+            if not os.path.exists(fdest_pdf):
+                im.save(fdest_pdf, "PDF", resolution=100.0)
+            #delete file in the folder
+            os.remove(fdest)
+
+            if n < count:
+                n+=1
+
+    process_complete()
+
+def process_complete():
+    global complete_screen
+
+    complete_screen = Tk()
+    complete_screen.geometry('200x100')
+    complete_screen.title('Process Complete')
+
+    Label(complete_screen, text='Processing Complete!').place(x=30, y=20)
+    Button(complete_screen, text='OK!', command=destroy_screen).place(x=60, y=60, height=30, width=60)
+
+def destroy_screen():
+    browse_screen.destroy()
+    complete_screen.destroy()
+
 main_home_screen()
