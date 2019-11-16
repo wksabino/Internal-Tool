@@ -108,8 +108,11 @@ def browse_files():
         maxsize = (380, 500)
         im = img.resize(maxsize)
         img = ImageTk.PhotoImage(im)
-        imglabel = Label(browse_screen, image=img).place(x=550, y=80, width=380, height=500)
-        imglabel.pack(side="bottom", fill="both", expand="yes")
+        imglabel = Label(browse_screen, image=img)
+        imglabel.image = img
+        imglabel.pack()
+        imglabel.place(x=550, y=80, width=380, height=500)
+        
 
     def id_files():
         empid = employee_id.get()
@@ -117,7 +120,7 @@ def browse_files():
         lbox2.insert(x, empid)
 
     lbox.bind("<<ListboxSelect>>", showcontent)
-    lbox.bind("<Double-Button-1>", opensystem)
+    lbox.bind("<Single-Button-1>", opensystem)
 
     Button(browse_screen, text='Process', command=process_screen).place(x=600, y=600, height=30, width=300)
 
