@@ -159,6 +159,8 @@ def process_screen():
     new_path = os.mkdir(fselected + "/" + dtype)
     new_path1 = str(fselected + "/" + dtype)
     #list all files in selected folder
+    # TODO Better to send a list of files instead of reading all files again to make sure we only process the files we have edited
+    # i.e flist can be just a list and every input of employee id, we just do flist1.append(file_path)
     flist1 = os.listdir(fselected)
     #list all entries for employee id
     employeeid = list(lbox2.get(0, END))
@@ -166,6 +168,8 @@ def process_screen():
     count = len(flist1)
 
     for file in flist1:
+        if file.startswith('.'): #Ignore Hidden Files
+            continue
         fsrce = fselected + "/" + file
         #process only files
         if os.path.isfile(fsrce):
