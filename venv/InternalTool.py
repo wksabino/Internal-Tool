@@ -10,8 +10,20 @@ def main_home_screen():
     global doc_type
 
     main_screen = Tk()
-    main_screen.geometry('270x180')
+    main_screen.geometry('420x240')
     main_screen.title('Internal Tool')
+
+    def destroy_window():
+        # check if processing, prevent close
+        # if not:
+        main_screen.destroy()
+
+    main_screen.protocol('WM_DELETE_WINDOW', destroy_window)  
+
+    # Bring window to top
+    main_screen.lift()
+    main_screen.attributes('-topmost',True)
+    main_screen.after_idle(main_screen.attributes,'-topmost',False)
 
     company_code = StringVar()
     doc_type = StringVar()
@@ -82,21 +94,31 @@ def browse_files():
     Entry(browse_screen, textvariable=employee_id).place(x=650, y=20, height=25, width=180)
 
     for item in flist:
+        if item.startswith('.'): #Ignore Hidden Files
+            continue
         lbox.insert(END, item)
-        lbox2.insert(END, 'Add Employee ID')
+        lbox2.insert(END, '')
 
-    def showcontent(event):
-        x = lbox.curselection()[0]
-        file1 = lbox.get(x)
-        file = fselected + "/" + file1
-        with open(file, 'rb') as file:
-            file = file.read()
+    # Delete na this if di na gagamitin
+    # or ilipat mo ung pagpreview ng image dito :)
+    # para mas madali basahin ung code
+    #
+    # def showcontent(event):
+    #     x = lbox.curselection()[0]
+    #     file1 = lbox.get(x)
+    #     file = fselected + "/" + file1
+    #     with open(file, 'rb') as file:
+    #         file = file.read()
 
     def opensystem(event):
         global file_id
         global x
         file_id = StringVar()
 
+        selection = lbox.curselection()
+        if not selection: # Default select first item in listbox
+            lbox.select_set(0)
+            lbox.event_generate("<<ListboxSelect>>")
         x = lbox.curselection()[0]
         file1 = lbox.get(x)
         file_id = file1
@@ -119,8 +141,9 @@ def browse_files():
         lbox2.delete(x)
         lbox2.insert(x, empid)
 
-    lbox.bind("<<ListboxSelect>>", showcontent)
-    lbox.bind("<Button-1>", opensystem)
+    lbox.bind("<<ListboxSelect>>", opensystem)
+    # Redundant with LISTBOXSELECT + showcontent no longer used, replace with opensystem
+    #lbox.bind("<Double-Button-1>", opensystem)
 
     Button(browse_screen, text='Process', command=process_screen).place(x=600, y=600, height=30, width=300)
 
