@@ -120,7 +120,7 @@ def browse_files():
         lbox2.insert(x, empid)
 
     lbox.bind("<<ListboxSelect>>", showcontent)
-    lbox.bind("<Single-Button-1>", opensystem)
+    lbox.bind("<Button-1>", opensystem)
 
     Button(browse_screen, text='Process', command=process_screen).place(x=600, y=600, height=30, width=300)
 
