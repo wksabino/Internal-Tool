@@ -1,11 +1,11 @@
 # UI
 
-# Replace "Add Employee ID" with blank or '------' - Mejo masakit sa mata ung paulit ulit na Add Employee ID hahaha
+# DONE - Replace "Add Employee ID" with blank or '------' - Mejo masakit sa mata ung paulit ulit na Add Employee ID hahaha
 # Use only one ListBox but with two columns for Files and Employee ID (Saves space) - Mejo over the top ung dalawang listbox, pwede ata sila pagsamahin sa isa hahah
 
 # UX
 
-# Use Single Click Preview instead of Double click on image ( Less effort for user)
+# DONE - Use Single Click Preview instead of Double click on image ( Less effort for user)
 # Reposition / Refactor Employee ID input -- current position is too far from File - better if mas malapit sa listbox
 # IMPROVEMENT: Upon clicking a file, the Employee ID Input comes to focus and is ready to receive input without being clicked.
 # IMPROVEMENT: Pressing enter in the Employee ID Input also saves the respective employee ID and goes to the next file automatically, input is cleared(blank) and is in focus again.
