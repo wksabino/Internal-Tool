@@ -1,7 +1,8 @@
+import shutil, os
 from tkinter import filedialog
 from tkinter import *
 from PIL import ImageTk, Image
-import shutil, os
+from scrollimage import ScrollableImage
 
 def main_home_screen():
     global main_screen
@@ -58,6 +59,10 @@ def browse_files():
     global employee_id
     global lbox2
     global browse_screen
+    global selected
+    global process_dict
+
+    process_dict = {}
 
     ccode = company_code.get()
     dtype = doc_type.get()
@@ -75,6 +80,14 @@ def browse_files():
     Label(browse_screen, text='Preview').place(x=710, y=55)
 
     flist = os.listdir(folder_selected)
+
+    def numbers_only(x):
+        value = ''.join(c for c in x if c.isdigit())
+        if not value:
+            return 0
+        return int(value)
+
+    flist = sorted(flist, key=numbers_only)  
     lbox = Listbox(browse_screen)
     lbox.place(x=20, y=80, width=220, height=500)
     lbox2 = Listbox(browse_screen)
@@ -91,13 +104,19 @@ def browse_files():
     lbox2.config(yscrollcommand=scrollbar2.set)
 
     id_label = Label(browse_screen, text='Add Employee ID: ').place(x=550, y=20)
-    Entry(browse_screen, textvariable=employee_id).place(x=650, y=20, height=25, width=180)
+    employee_id_input = Entry(browse_screen, textvariable=employee_id)
+    employee_id_input.place(x=650, y=20, height=25, width=180)
 
     for item in flist:
         if item.startswith('.'): #Ignore Hidden Files
             continue
+        if not os.path.isfile(folder_selected + '/' + item):
+            continue
         lbox.insert(END, item)
-        lbox2.insert(END, '')
+        lbox2.insert(END, '-')
+    
+    selected = 0
+    lbox.select_set(selected)
 
     # Delete na this if di na gagamitin
     # or ilipat mo ung pagpreview ng image dito :)
@@ -109,6 +128,7 @@ def browse_files():
     #     file = fselected + "/" + file1
     #     with open(file, 'rb') as file:
     #         file = file.read()
+
 
     def opensystem(event):
         global file_id
@@ -125,23 +145,43 @@ def browse_files():
         file = fselected + "/" + file1
 
         Button(browse_screen, text='Save', command=id_files).place(x=840, y=20, height=25, width=50)
+        # Move this to show content method for better code readability
+        img = ImageTk.PhotoImage(file=file)
+        # maxsize = (380, 500)
+        # im = img.resize(maxsize)
+        show_image = ScrollableImage(browse_screen, image=img)
+        # imglabel = Label(browse_screen, image=img)
+        # imglabel.image = img
+        show_image.pack()
+        show_image.place(x=550, y=80, width=380, height=500)
+    
+    def OnEntryDown(event):
+        selected = lbox.curselection()[0]
+        if selected < lbox.size()-1:
+            lbox.select_clear(selected)
+            selected += 1
+            lbox.select_set(selected)
+        opensystem(event)
 
-        img = Image.open(file)
-        maxsize = (380, 500)
-        im = img.resize(maxsize)
-        img = ImageTk.PhotoImage(im)
-        imglabel = Label(browse_screen, image=img)
-        imglabel.image = img
-        imglabel.pack()
-        imglabel.place(x=550, y=80, width=380, height=500)
+    def OnEntryUp(event):
+        selected = lbox.curselection()[0]
+        if selected > 0:
+            lbox.select_clear(selected)
+            selected -= 1
+            lbox.select_set(selected)
+        opensystem(event)
         
 
-    def id_files():
+    def id_files(event=None):
         empid = employee_id.get()
         lbox2.delete(x)
         lbox2.insert(x, empid)
+        process_dict[lbox.get(x)] = empid
 
     lbox.bind("<<ListboxSelect>>", opensystem)
+    browse_screen.bind("<Down>", OnEntryDown)
+    browse_screen.bind("<Up>", OnEntryUp)
+    employee_id_input.bind('<Return>', id_files)
     # Redundant with LISTBOXSELECT + showcontent no longer used, replace with opensystem
     #lbox.bind("<Double-Button-1>", opensystem)
 
@@ -155,6 +195,9 @@ def process_screen():
     new_path = StringVar()
     n = 0
 
+    # Check if current path is existing
+    # if yes prompt user if delete or change folder
+
     #create a new folder with document type as folder name
     new_path = os.mkdir(fselected + "/" + dtype)
     new_path1 = str(fselected + "/" + dtype)
@@ -162,26 +205,38 @@ def process_screen():
     # TODO Better to send a list of files instead of reading all files again to make sure we only process the files we have edited
     # i.e flist can be just a list and every input of employee id, we just do flist1.append(file_path)
     flist1 = os.listdir(fselected)
+    def numbers_only(x):
+        value = ''.join(c for c in x if c.isdigit())
+        if not value:
+            return 0
+        return int(value)
+
+    flist1 = sorted(flist1, key=numbers_only) 
     #list all entries for employee id
     employeeid = list(lbox2.get(0, END))
     #get total count of files in selected folder
     count = len(flist1)
 
-    for file in flist1:
+    for file, empid in list(process_dict.items()):
+        print(f'Processing {file}')
         if file.startswith('.'): #Ignore Hidden Files
             continue
+        if empid == '-':  # Ignore Files without Tag
+            if n < count:
+                n += 1 
+            continue
         fsrce = fselected + "/" + file
+        print(f'Source: {fsrce}')
         #process only files
         if os.path.isfile(fsrce):
-            emp_id = employeeid[n]
             fname, file_ext = os.path.splitext(file)
             #rename files to copy
-            dest_name = ccode + "_" + emp_id + "_" + dtype + file_ext
+            dest_name = ccode + "_" + empid + "_" + dtype + file_ext
             fdest = new_path1  + "/" + dest_name
             shutil.copy(fsrce, fdest)
 
             #name of file to pdf
-            dest_name_pdf = ccode + "_" + emp_id + "_" + dtype + ".pdf"
+            dest_name_pdf = ccode + "_" + empid + "_" + dtype + ".pdf"
             fdest_pdf = new_path1  + "/" + dest_name_pdf
             #convert file to pdf
             im=Image.open(fdest)
