@@ -59,7 +59,6 @@ def browse_files():
     global lbox2
     global browse_screen
 
-
     ccode = company_code.get()
     dtype = doc_type.get()
 
@@ -101,7 +100,7 @@ def browse_files():
     id_label = Label(browse_screen, text='Employee ID: ').place(x=20, y=40)
     employee_id1 = Entry(browse_screen, textvariable=employee_id)
     employee_id1.place(x=100, y=40, height=25, width=150)
-    employee_id1.bind('<Return>', lambda x: id_files_enter())
+    employee_id1.bind('<Return>', lambda x : id_files_enter())
 
     for item in flist:
         if item.startswith('.'): #Ignore Hidden Files
@@ -131,7 +130,14 @@ def browse_files():
         imglabel.image = img
         imglabel.pack()
         imglabel.place(x=350, y=80, width=380, height=500)
-        # how to set focus pag open ng screen at pag nagclick ng file para sa employee ID
+
+        # Bring window to top
+        browse_screen.lift()
+        browse_screen.attributes('-topmost', True)
+        browse_screen.after_idle(browse_screen.attributes, '-topmost', False)
+        browse_screen.focus_force()
+        employee_id1.focus_set()
+        print("focus")
 
     def id_files_enter():
         #how to add 1 on x every enter :(
