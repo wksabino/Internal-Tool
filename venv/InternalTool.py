@@ -59,6 +59,7 @@ def browse_files():
     global lbox2
     global browse_screen
 
+
     ccode = company_code.get()
     dtype = doc_type.get()
 
@@ -100,7 +101,7 @@ def browse_files():
     id_label = Label(browse_screen, text='Employee ID: ').place(x=20, y=40)
     employee_id1 = Entry(browse_screen, textvariable=employee_id)
     employee_id1.place(x=100, y=40, height=25, width=150)
-    employee_id1.bind('<Return>', lambda x: id_files())
+    employee_id1.bind('<Return>', lambda x: id_files_enter())
 
     for item in flist:
         if item.startswith('.'): #Ignore Hidden Files
@@ -114,10 +115,6 @@ def browse_files():
         file_id = StringVar()
 
         selection = lbox.curselection()
-        if not selection: # Default select first item in listbox
-            x = lbox.select_set(0)
-            print(x)
-            lbox.event_generate("<<ListboxSelect>>")
         x = lbox.curselection()[0]
 
         file1 = lbox.get(x)
@@ -134,14 +131,23 @@ def browse_files():
         imglabel.image = img
         imglabel.pack()
         imglabel.place(x=350, y=80, width=380, height=500)
+        # how to set focus pag open ng screen at pag nagclick ng file para sa employee ID
+
+    def id_files_enter():
+        #how to add 1 on x every enter :(
+        id_files()
 
     def id_files():
         empid = employee_id.get()
         lbox2.delete(x)
         lbox2.insert(x, empid)
         employee_id.set("")
+        lbox.select_set(x+1)
+        lbox.event_generate("<<ListboxSelect>>")
 
     lbox.bind("<<ListboxSelect>>", opensystem)
+    lbox.select_set(0) # Default select first item in listbox
+    lbox.event_generate("<<ListboxSelect>>")
 
     Button(browse_screen, text='Process', command=process_screen).place(x=400, y=600, height=30, width=300)
 
