@@ -52,6 +52,8 @@ def folder_screen():
     main_screen.destroy()
     browse_files()
 
+
+
 def browse_files():
     global ccode
     global dtype
@@ -84,23 +86,13 @@ def browse_files():
         lbox.yview(*args)
         lbox2.yview(*args)
 
-    def OnMouseWheel(event):
-        lbox.yview("scroll", event.delta, "units")
-        lbox2.yview("scroll", event.delta, "units")
-        # this prevents default bindings from firing, which
-        # would end up scrolling the widget twice
-        return "break"
-
     scrollbar = Scrollbar(lbox2, orient="vertical", command=OnVsb)
     scrollbar.pack(side="right", fill="y")
-    lbox.bind("<MouseWheel>", OnMouseWheel)
-    lbox2.bind("<MouseWheel>", OnMouseWheel)
     lbox2.config(yscrollcommand=scrollbar.set)
 
     id_label = Label(browse_screen, text='Employee ID: ').place(x=20, y=40)
     employee_id1 = Entry(browse_screen, textvariable=employee_id)
     employee_id1.place(x=100, y=40, height=25, width=150)
-    employee_id1.bind('<Return>', lambda x : id_files_enter())
 
     for item in flist:
         if item.startswith('.'): #Ignore Hidden Files
@@ -110,13 +102,11 @@ def browse_files():
 
     def opensystem(event):
         global file_id
-        global x
+        global selected
         file_id = StringVar()
+        selected = lbox.curselection()[0]
 
-        selection = lbox.curselection()
-        x = lbox.curselection()[0]
-
-        file1 = lbox.get(x)
+        file1 = lbox.get(selected)
         file_id = file1
         file = fselected + "/" + file1
 
@@ -136,25 +126,47 @@ def browse_files():
         browse_screen.attributes('-topmost', True)
         browse_screen.after_idle(browse_screen.attributes, '-topmost', False)
         browse_screen.focus_force()
-        employee_id1.focus_set()
-        print("focus")
-
-    def id_files_enter():
-        #how to add 1 on x every enter :(
-        x=+1
-        id_files()
-
-    def id_files():
-        empid = employee_id.get()
-        lbox2.delete(x)
-        lbox2.insert(x, empid)
         employee_id.set("")
-        lbox.select_set(x+1)
+        employee_id1.focus_set()
+        
+    def OnEntryDown(event):
+        selected = lbox.curselection()[0]
+        if selected < lbox.size()-1:
+            lbox.select_clear(selected)
+            selected += 1
+            lbox.select_set(selected)
+            lbox.event_generate("<<ListboxSelect>>")
+        opensystem(event)
+
+    def OnEntryUp(event):
+        selected = lbox.curselection()[0]
+        if selected > 0:
+            lbox.select_clear(selected)
+            selected -= 1
+            lbox.select_set(selected)
+            lbox.event_generate("<<ListboxSelect>>")
+        opensystem(event)
+
+    def id_files(event):
+        selected = lbox.curselection()[0]
+        empid = employee_id.get()
+        lbox2.delete(selected)
+        lbox2.insert(selected, empid)
+        lbox.select_clear(selected)
+        selected +=1
+        employee_id.set("")
+        lbox.select_set(selected)
         lbox.event_generate("<<ListboxSelect>>")
 
     lbox.bind("<<ListboxSelect>>", opensystem)
-    lbox.select_set(0) # Default select first item in listbox
-    lbox.event_generate("<<ListboxSelect>>")
+    browse_screen.bind("<Up>", OnEntryUp)
+    browse_screen.bind("<Down>", OnEntryDown)
+    employee_id1.bind('<Return>', id_files)
+    selection = lbox.curselection()
+    if not selection: # Default select first item in listbox
+        lbox.select_set(0)
+        lbox.event_generate("<<ListboxSelect>>")
+        
 
     Button(browse_screen, text='Process', command=process_screen).place(x=400, y=600, height=30, width=300)
 
