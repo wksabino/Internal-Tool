@@ -135,6 +135,7 @@ def browse_files():
 
     def id_files_enter():
         #how to add 1 on x every enter :(
+        x=+1
         id_files()
 
     def id_files():
