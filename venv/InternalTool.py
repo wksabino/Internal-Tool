@@ -52,8 +52,6 @@ def folder_screen():
     main_screen.destroy()
     browse_files()
 
-
-
 def browse_files():
     global ccode
     global dtype
@@ -100,6 +98,9 @@ def browse_files():
         lbox.insert(END, item)
         lbox2.insert(END, '')
 
+    def double_click(event):
+        opensystem(event)
+
     def opensystem(event):
         global file_id
         global selected
@@ -136,7 +137,6 @@ def browse_files():
             selected += 1
             lbox.select_set(selected)
             lbox.event_generate("<<ListboxSelect>>")
-        opensystem(event)
 
     def OnEntryUp(event):
         selected = lbox.curselection()[0]
@@ -145,7 +145,6 @@ def browse_files():
             selected -= 1
             lbox.select_set(selected)
             lbox.event_generate("<<ListboxSelect>>")
-        opensystem(event)
 
     def id_files(event):
         selected = lbox.curselection()[0]
@@ -159,6 +158,7 @@ def browse_files():
         lbox.event_generate("<<ListboxSelect>>")
 
     lbox.bind("<<ListboxSelect>>", opensystem)
+    lbox.bind("<Double-1>", double_click)
     browse_screen.bind("<Up>", OnEntryUp)
     browse_screen.bind("<Down>", OnEntryDown)
     employee_id1.bind('<Return>', id_files)
@@ -166,7 +166,6 @@ def browse_files():
     if not selection: # Default select first item in listbox
         lbox.select_set(0)
         lbox.event_generate("<<ListboxSelect>>")
-        
 
     Button(browse_screen, text='Process', command=process_screen).place(x=400, y=600, height=30, width=300)
 
