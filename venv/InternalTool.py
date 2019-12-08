@@ -52,9 +52,9 @@ def folder_screen():
     folder_selected = filedialog.askdirectory()
     fselected = folder_selected
 
-    main_screen.destroy()
+    
     browse_files()
-
+    main_screen.withdraw()
 
 
 def browse_files():
