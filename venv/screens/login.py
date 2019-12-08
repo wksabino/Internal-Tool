@@ -36,7 +36,8 @@ class LoginScreen:
                 data_dict = self.kwargs['data']
                 company_code = self.kwargs['company_code']
                 doc_type = self.kwargs['doc_type']
-                UploadScreen(token, data_dict, company_code, doc_type)
+                selected_folder = self.kwargs['selected_folder']
+                UploadScreen(token, data_dict, company_code, doc_type, selected_folder)
             self.master.destroy()
         else:
             error = Label(self.master, text="{}".format(message)).place(x=80, y=130)

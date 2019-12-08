@@ -163,7 +163,7 @@ class InitialScreen:
             lbox.event_generate("<<ListboxSelect>>")
             
         def open_login():
-            login_screen = LoginScreen(action='upload', data=process_dict, company_code=ccode, doc_type=dtype)
+            login_screen = LoginScreen(action='upload', data=process_dict, company_code=ccode, doc_type=dtype, selected_folder=initial_screen.selected_folder)
 
         Button(browse_screen, text='Process', command=initial_screen.process_screen).place(x=400, y=600, height=30, width=300)
         Button(browse_screen, text='Login & Upload', command=open_login).place(x=50, y=600, height=30, width=300)
