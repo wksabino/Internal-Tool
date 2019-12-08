@@ -1,7 +1,10 @@
 from tkinter import filedialog
 from tkinter import *
 from PIL import ImageTk, Image
+from scrollimage import ScrollableImage
 import shutil, os
+
+from screens.login import LoginScreen
 
 def main_home_screen():
     global main_screen
@@ -61,6 +64,8 @@ def browse_files():
     global lbox2
     global browse_screen
 
+    process_dict = {}
+
     ccode = company_code.get()
     dtype = doc_type.get()
 
@@ -112,14 +117,15 @@ def browse_files():
 
         Button(browse_screen, text='Save', command=id_files).place(x=260, y=40, height=25, width=50)
 
-        img = Image.open(file)
-        maxsize = (380, 500)
-        im = img.resize(maxsize)
-        img = ImageTk.PhotoImage(im)
-        imglabel = Label(browse_screen, image=img)
-        imglabel.image = img
-        imglabel.pack()
-        imglabel.place(x=350, y=80, width=380, height=500)
+        img = ImageTk.PhotoImage(file=file)
+        # maxsize = (380, 500)
+        # im = img.resize(maxsize)
+        show_image = ScrollableImage(browse_screen, image=img)
+        # img = ImageTk.PhotoImage(im)
+        # imglabel = Label(browse_screen, image=img)
+        # imglabel.image = img
+        show_image.pack()
+        show_image.place(x=350, y=80, width=380, height=500)
 
         # Bring window to top
         browse_screen.lift()
@@ -147,11 +153,12 @@ def browse_files():
             lbox.event_generate("<<ListboxSelect>>")
         opensystem(event)
 
-    def id_files(event):
+    def id_files(event=None):
         selected = lbox.curselection()[0]
         empid = employee_id.get()
         lbox2.delete(selected)
         lbox2.insert(selected, empid)
+        process_dict[lbox.get(selected)] = empid
         lbox.select_clear(selected)
         selected +=1
         employee_id.set("")
@@ -167,8 +174,11 @@ def browse_files():
         lbox.select_set(0)
         lbox.event_generate("<<ListboxSelect>>")
         
+    def open_login():
+        login_screen = LoginScreen()
 
     Button(browse_screen, text='Process', command=process_screen).place(x=400, y=600, height=30, width=300)
+    Button(browse_screen, text='Login & Upload', command=open_login).place(x=50, y=600, height=30, width=300)
 
     browse_screen.mainloop()
 
@@ -190,7 +200,7 @@ def process_screen():
     #get total count of files in selected folder
     count = len(flist1)
 
-    for file in flist1:
+    for file, empid in list(process_dict.items()):
         if file.startswith('.'): #Ignore Hidden Files
             continue
         fsrce = fselected + "/" + file
