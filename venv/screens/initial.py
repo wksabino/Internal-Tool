@@ -93,6 +93,15 @@ class InitialScreen:
             lbox.insert(END, item)
             lbox2.insert(END, '')
 
+        def clear_process_dict():
+            process_dict = {}
+            lbox2.delete(0, 'end')
+            for item in flist:
+                if item.startswith('.'): #Ignore Hidden Files
+                    continue
+            
+                lbox2.insert(END, '') 
+
         def opensystem(event):
             global file_id
             global selected
@@ -104,16 +113,18 @@ class InitialScreen:
             file = initial_screen.selected_folder + "/" + file1
 
             Button(browse_screen, text='Save', command=id_files).place(x=260, y=40, height=25, width=50)
-
-            img = ImageTk.PhotoImage(master=browse_screen, file=file)
-            # maxsize = (380, 500)
-            # im = img.resize(maxsize)
-            show_image = ScrollableImage(browse_screen, image=img)
-            # img = ImageTk.PhotoImage(im)
-            # imglabel = Label(browse_screen, image=img)
-            # imglabel.image = img
-            show_image.pack()
-            show_image.place(x=350, y=80, width=380, height=500)
+            Button(browse_screen, text='Clear All', command=clear_process_dict).place(x=300, y=40, height=25, width=50)
+            extension = file1.split('.')[-1]
+            if extension in ['png', 'jpg', 'jpeg', 'bmp']:
+                img = ImageTk.PhotoImage(master=browse_screen, file=file)
+                # maxsize = (380, 500)
+                # im = img.resize(maxsize)
+                show_image = ScrollableImage(browse_screen, image=img)
+                # img = ImageTk.PhotoImage(im)
+                # imglabel = Label(browse_screen, image=img)
+                # imglabel.image = img
+                show_image.pack()
+                show_image.place(x=350, y=80, width=380, height=500)
 
             # Bring window to top
             browse_screen.lift()
